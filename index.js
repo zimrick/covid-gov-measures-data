@@ -4,7 +4,7 @@ const path = require("path")
 const d3dsv = require("d3-dsv")
 const groupBy = require("lodash/groupBy")
 const fetch = require("node-fetch")
-// const dayjs = require("dayjs")
+const dayjs = require("dayjs")
 
 const src = "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_responses.csv"
 // const src2 = path.join(__dirname, "./data/world-md-2.json")
@@ -24,6 +24,7 @@ fetch(src)
       const base = {
         name: countryData[0].CountryName,
         id: countryData[0].CountryCode,
+        updated: dayjs().format("ddd DD.MM.YYYY"),
       }
 
       countryData.forEach(d => {
