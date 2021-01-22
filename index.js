@@ -9,7 +9,7 @@ const dayjs = require("dayjs")
 const src = "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_responses.csv"
 // const src2 = path.join(__dirname, "./data/world-md-2.json")
 const outputFile = path.join(__dirname, "./public/data.csv")
-const outputFile2 = path.join(__dirname, "./public/countries-list.json")
+// const outputFile2 = path.join(__dirname, "./public/countries-list.json")
 
 fetch(src)
   .then(res => res.text())
@@ -44,9 +44,9 @@ fetch(src)
 
     const csv = d3dsv.csvFormat(reformatted)
 
-    fs.writeFile(outputFile2, JSON.stringify(finalCountryData), "utf8").then(() => {
-      console.log("Done writing countries!")
-    })
+    // fs.writeFile(outputFile2, JSON.stringify(finalCountryData), "utf8").then(() => {
+    //   console.log("Done writing countries!")
+    // })
 
     fs.writeFile(outputFile, csv, "utf8").then(() => {
       console.log("Done writing indicators!")
