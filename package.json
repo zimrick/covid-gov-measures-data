@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "getUsPolicyData": "node us-policies.js",
     "getPolicyData": "node policies.js",
     "getVaccineData": "node vaccines.js",
     "getData": "npm run getPolicyData && npm run getVaccineData",
