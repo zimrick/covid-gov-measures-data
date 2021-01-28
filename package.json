@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "getUsPolicyData": "node us-policies.js",
     "getPolicyData": "node policies.js",
+    "getUsPolicyData": "node us-policies.js",
     "getVaccineData": "node vaccines.js",
-    "getData": "npm run getPolicyData && npm run getUsPolicyData npm run getVaccineData",
+    "getUsVaccineData": "node us-vaccines.js",
+    "getAllPolicyData": "npm run getPolicyData && npm run getUsPolicyData",
+    "getAllVaccineData": "npm run getVaccineData && npm run getUsVaccineData",
+    "getAllData": "npm run getAllPolicyData && npm run getAllVaccineData",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
