@@ -5,8 +5,9 @@ const fetch = require("node-fetch")
 const d3dsv = require("d3-dsv")
 const groupBy = require("lodash/groupBy")
 const sortBy = require("lodash/sortBy")
+const dayjs = require("dayjs")
 
-const src = "https://raw.githubusercontent.com/OxCGRT/USA-covid-policy/master/data/OxCGRT_US_latest.csv"
+const src = "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_withnotes.csv"
 const outputFile = path.join(__dirname, "./public/us-data.csv")
 
 fetch(src)
@@ -34,20 +35,31 @@ fetch(src)
 
     const columnsToInclude = [
       "RegionCode",
+      "RegionName",
       "Date",
     ]
 
     const notesToInclude = indicatorsToInclude.map(d => d.split("_")[0] + "_Notes")
 
+    const national = parsed
+      .filter(d => d.CountryCode === "USA" && d.Jurisdiction === "NAT_TOTAL")
+      .map(d => [...columnsToInclude, ...indicatorsToInclude, ...notesToInclude].reduce((acc, cur) => ({
+        ...acc,
+        RegionCode: "USA",
+        RegionName: "United States",
+        [cur]: d[cur], // Make sure to only keep the id instead of the whole indicator
+      }), {}))
+
     const subnational = parsed
-      .filter(d => d.RegionCode && d.Jurisdiction === "STATE_WIDE")
+      // .filter(d => d.RegionCode && d.Jurisdiction === "STATE_WIDE")
+      .filter(d => d.CountryCode === "USA" && d.RegionCode && d.Jurisdiction === "STATE_TOTAL")
       .filter(d => d.RegionCode !== "US_VI") // Filter out virgin islands
       .map(d => [...columnsToInclude, ...indicatorsToInclude, ...notesToInclude].reduce((acc, cur) => ({
         ...acc,
         [cur]: d[cur], // Make sure to only keep the id instead of the whole indicator
       }), {}))
 
-    const groupedByState = groupBy(subnational, o => o.RegionCode)
+    const groupedByState = groupBy([...national, ...subnational], o => o.RegionCode)
 
     const allStateIds = Object.keys(groupedByState)
 
@@ -58,6 +70,7 @@ fetch(src)
         const latestIndicatorValue = stateTimeSeries.reduce((acc, cur, i) => {
           const notesId = indicator.split("_")[0] + "_Notes"
           const value = parseInt(cur[indicator])
+          // const value = cur[indicator]
           if (!i) return { Date: cur.Date, value, notes: cur[notesId] }
           const isValid = value || value === 0
           return isValid
@@ -69,14 +82,29 @@ fetch(src)
         // acc[cur.indicator] = { date: cur.Date, value: cur.value }
 
         acc[cur.indicator] = cur.value
-        acc[cur.indicator.split("_")[0] + "_Notes"] = cur.notes
+        acc["notes_" + cur.indicator.split("_")[0]] = cur.notes
         return acc
       }, {})
 
-      return { id: stateId.split("_")[1], ...latestData }
+      const name = groupedByState[stateId][0].RegionName
+
+      return {
+        id: stateId === "USA" ? stateId : stateId.split("_")[1],
+        level: stateId === "USA" ? 0 : 1,
+        name,
+        ...latestData
+      }
     })
 
-    const csv = d3dsv.csvFormat(allStateData)
+    const combinedData = allStateData
+      .map(({ name, id, ...restProps }) => ({
+        name,
+        id,
+        updated: dayjs().format("ddd DD.MM.YYYY"),
+        ...restProps,
+      }))
+
+    const csv = d3dsv.csvFormat(combinedData)
 
     fs.writeFile(outputFile, csv, "utf8").then(() => {
       console.log("Done writing US state indicators!")
