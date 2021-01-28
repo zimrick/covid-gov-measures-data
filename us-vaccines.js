@@ -86,7 +86,6 @@ fetch(src)
       const metaData = states.find(s => s.name === d.location) || {}
       return {
         location: d.location,
-        // iso_code: d.iso_code,
         iso_code: metaData.id || "",
         date: d.date,
         total_vaccinations: d.total_vaccinations,
