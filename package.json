@@ -7,7 +7,7 @@
     "getUsPolicyData": "node us-policies.js",
     "getPolicyData": "node policies.js",
     "getVaccineData": "node vaccines.js",
-    "getData": "npm run getPolicyData && npm run getVaccineData",
+    "getData": "npm run getPolicyData && npm run getUsPolicyData npm run getVaccineData",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
