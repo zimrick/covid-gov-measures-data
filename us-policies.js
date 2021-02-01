@@ -100,7 +100,7 @@ fetch(src)
       .map(({ name, id, ...restProps }) => ({
         name,
         id,
-        updated: dayjs().format("ddd DD.MM.YYYY"),
+        updated: dayjs().format("ddd DD MMM YYYY"),
         ...restProps,
       }))
 
