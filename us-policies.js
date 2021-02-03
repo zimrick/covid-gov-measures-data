@@ -37,6 +37,22 @@ fetch(src)
       "RegionCode",
       "RegionName",
       "Date",
+
+      "C1_Flag",
+      "C2_Flag",
+      "C3_Flag",
+      "C4_Flag",
+      "C5_Flag",
+      "C6_Flag",
+      "C7_Flag",
+      "C8_Flag",
+      "E1_Flag",
+      "E2_Flag",
+      "H1_Flag",
+      "H2_Flag",
+      "H3_Flag",
+      "H6_Flag",
+      "H7_Flag",
     ]
 
     const notesToInclude = indicatorsToInclude.map(d => d.split("_")[0] + "_Notes")
@@ -69,12 +85,26 @@ fetch(src)
       const latestData = indicatorsToInclude.map(indicator => {
         const latestIndicatorValue = stateTimeSeries.reduce((acc, cur, i) => {
           const notesId = indicator.split("_")[0] + "_Notes"
+          const flagId = indicator.split("_")[0] + "_Flag"
           const value = parseInt(cur[indicator])
           // const value = cur[indicator]
           if (!i) return { Date: cur.Date, value, notes: cur[notesId] }
           const isValid = value || value === 0
           return isValid
-            ? { Date: cur.Date, value, notes: cur[notesId] ? cur[notesId] : acc.notes ? acc.notes : "NO NOTES" }
+            ? {
+              Date: cur.Date,
+              value,
+              flag: cur[flagId]
+                ? cur[flagId]
+                : acc.flag
+                  ? acc.flag
+                  : "NO FLAG",
+              notes: cur[notesId]
+                ? cur[notesId]
+                : acc.notes
+                  ? acc.notes
+                  : "NO NOTES",
+              }
             : acc
         }, {})
         return { indicator, ...latestIndicatorValue }
@@ -82,6 +112,7 @@ fetch(src)
         // acc[cur.indicator] = { date: cur.Date, value: cur.value }
 
         acc[cur.indicator] = cur.value
+        acc["flag_" + cur.indicator.split("_")[0]] = cur.flag
         acc["notes_" + cur.indicator.split("_")[0]] = cur.notes
         return acc
       }, {})
